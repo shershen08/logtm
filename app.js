@@ -1,31 +1,44 @@
+const low = require('lowdb');
 
-let currentTask = '';
-let currentProject = '';
-let timeStart;
+const db = low('./db.json')
+
+const STATES = {
+    'STILL': 'STILL',
+    'RUNNING': 'RUNNING'
+};
 
 module.exports = app = {
     run: (options) => {
-        if(options.message) {
-            spawnCounter(options.message)
+        const state = db.get('_state');
+        if (state.value() == STATES.RUNNING) {
+            persistTrack(stopCounter())
         } else {
-            console.log(stopCounter());
+            if (!options.message) {
+                console.log('No task description provided');
+                return;
+            }
+            db.set('_state', STATES.RUNNING).write();
+            db.set('records', []).write();
+            db.set('_current', {
+                timeStart: new Date().getTime(),
+                message: options.message
+            }).write();
         }
-    }
-}
 
-const spawnCounter = (msg) => {
-    currentTask = msg;
-    timeStart = new Date().getTime();
+    }
 }
 
 const stopCounter = () => {
-    return {
-        start: timeStart,
-        duration: timeStart - new Date().getTime(),
-        message: currentTask
-    }
+    const curr = db.get('_current').value();
+    return Object.assign({}, curr, {
+        duration: new Date().getTime() - curr.timeStart,
+    });
 }
 
-const getWritingFile = () => {
-
+const persistTrack = (trackObject) => {
+    db.get('records')
+        .push(trackObject)
+        .write();
+    db.set('_state', STATES.STILL)
+        .write();
 }
