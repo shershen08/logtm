@@ -1,4 +1,5 @@
-var argv = require('minimist')(process.argv.slice(2));
+let argv = require('minimist')(process.argv.slice(2));
+const app = require('./app');
 /**
  * CLI tool for time tracking
  * produces readable JSON 
@@ -29,25 +30,3 @@ const parseOptions = () => {
 }
 
 app.run(parseOptions());
-
-const app = {
-    run: (options) => {
-
-    }
-}
-
-const spawnCounter = () => {
-
-}
-
-const stopCounter = () => {
-
-}
-
-const collectData = () => {
-
-}
-
-const getWritingFile = () => {
-
-}
