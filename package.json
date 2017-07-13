@@ -1,7 +1,7 @@
 {
   "name": "cli-timetracker",
   "version": "1.0.0",
-  "description": "",
+  "description": "CLI time tracking",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,7 +9,11 @@
   "author": "mkuznetcov",
   "license": "MIT",
   "dependencies": {
+    "cowsay": "^1.1.9",
     "lowdb": "^0.16.2",
     "minimist": "^1.2.0"
+  },
+  "bin": {
+    "logtm": "index.js"
   }
 }

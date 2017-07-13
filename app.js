@@ -1,6 +1,7 @@
 const low = require('lowdb');
+const cow = require("cowsay");
 
-const db = low('./db.json')
+const db = low('./db.json');
 
 const STATES = {
     'STILL': 'STILL',
@@ -9,6 +10,14 @@ const STATES = {
 
 module.exports = app = {
     run: (options) => {
+        
+        console.log(options)
+
+        if(options.showhelp){
+            displayHelp();
+            return;
+        }
+
         const state = db.get('_state');
         if (state.value() == STATES.RUNNING) {
             persistTrack(stopCounter())
@@ -17,15 +26,20 @@ module.exports = app = {
                 console.log('No task description provided');
                 return;
             }
-            db.set('_state', STATES.RUNNING).write();
-            db.set('records', []).write();
-            db.set('_current', {
+            setState(STATES.RUNNING);
+            setCurrent({
                 timeStart: new Date().getTime(),
                 message: options.message
-            }).write();
+            })
+
+            console.log(cow.say({text: 'Started logging', e : "oO",T : "U "}));
         }
 
     }
+}
+
+const displayHelp = () => {
+    console.log('Usage detils go here .... -m ');
 }
 
 const stopCounter = () => {
@@ -35,10 +49,26 @@ const stopCounter = () => {
     });
 }
 
+const setCurrent = value => {
+    db.set('_current', value).write();
+}
+
+const setState = value => {
+  db.set('_state', value).write();
+}
+
 const persistTrack = (trackObject) => {
-    db.get('records')
+    let records = db.get('records');
+    if(!records.value()){
+        db.set('records', []).write();
+    }
+    records
         .push(trackObject)
         .write();
-    db.set('_state', STATES.STILL)
-        .write();
+    setState(STATES.STILL);
+    setCurrent();
+}
+
+const convertDuration = lengthInMs => {
+    
 }
