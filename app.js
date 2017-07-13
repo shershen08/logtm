@@ -1,12 +1,10 @@
 const low = require('lowdb');
 const cow = require("cowsay");
+const ChartjsNode = require('chartjs-node');
 
 const db = low('./db.json');
 
-const STATES = {
-    'STILL': 'STILL',
-    'RUNNING': 'RUNNING'
-};
+import {STATES, texts} from './config';
 
 module.exports = app = {
     run: (options) => {
@@ -23,7 +21,7 @@ module.exports = app = {
             persistTrack(stopCounter())
         } else {
             if (!options.message) {
-                console.log('No task description provided');
+                console.log(.error.no_text_provided);
                 return;
             }
             setState(STATES.RUNNING);
@@ -32,15 +30,17 @@ module.exports = app = {
                 message: options.message
             })
 
-            console.log(cow.say({text: 'Started logging', e : "oO",T : "U "}));
+            console.log(cow.say({text: texts.loging_start , e : "oO",T : "U "}));
         }
 
     }
 }
 
-const displayHelp = () => {
-    console.log('Usage detils go here .... -m ');
-}
+const displayHelp = () => console.log(texts.help.generic);
+
+const setCurrent = value => db.set('_current', value).write();
+
+const setState = value => db.set('_state', value).write();
 
 const stopCounter = () => {
     const curr = db.get('_current').value();
@@ -49,15 +49,7 @@ const stopCounter = () => {
     });
 }
 
-const setCurrent = value => {
-    db.set('_current', value).write();
-}
-
-const setState = value => {
-  db.set('_state', value).write();
-}
-
-const persistTrack = (trackObject) => {
+const persistTrack = trackObject => {
     let records = db.get('records');
     if(!records.value()){
         db.set('records', []).write();
